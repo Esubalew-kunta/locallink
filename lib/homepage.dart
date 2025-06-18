@@ -1,8 +1,7 @@
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:location/location.dart'; // <<< Changed import to 'location' package
 
 // For simplicity, the User model is here. It's best to keep it in a separate file.
 class AppUser {
@@ -21,9 +20,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // Initialize Location service from the 'location' package
+  final Location _location = Location();
 
   bool _isSharingLocation = true;
-  Position? _currentPosition;
+  LocationData? _currentPosition; // <<< Changed type to LocationData?
   final Set<Marker> _markers = {};
   List<AppUser> _nearbyUsers = [];
   bool _isLoading = true;
@@ -58,47 +59,70 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // Fetches the user's current GPS location
+  // Fetches the user's current GPS location using the 'location' package
   Future<void> _determinePosition() async {
-    // Check for permissions and services
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Handle service not enabled
-      setState(() => _isLoading = false);
-      return;
-    }
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
+    LocationData? locationData;
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
+    // 1. Check if location service is enabled
+    serviceEnabled = await _location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await _location.requestService();
+      if (!serviceEnabled) {
         setState(() => _isLoading = false);
-        return;
+        print("Location service not enabled after request.");
+        return; // Return if user did not enable service
       }
     }
 
-    if (permission == LocationPermission.deniedForever) {
-      setState(() => _isLoading = false);
-      return;
+    // 2. Check for location permission
+    permissionGranted = await _location.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await _location.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
+        setState(() => _isLoading = false);
+        print("Location permission denied after request.");
+        return; // Return if user did not grant permission
+      }
     }
 
-    // Get position and update the state
-    Position position = await Geolocator.getCurrentPosition();
-    setState(() {
-      _currentPosition = position;
-      _markers.add(
-        Marker(
-          markerId: const MarkerId('currentUser'),
-          position: LatLng(position.latitude, position.longitude),
-          infoWindow: const InfoWindow(title: 'Your Location'),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-        ),
-      );
-      _isLoading = false;
-    });
+    // 3. If permissions and service are good, get the location
+    if (permissionGranted == PermissionStatus.granted && serviceEnabled) {
+      try {
+        locationData = await _location.getLocation();
+        if (locationData.latitude != null && locationData.longitude != null) {
+          setState(() {
+            _currentPosition = locationData;
+            _markers.add(
+              Marker(
+                markerId: const MarkerId('currentUser'),
+                // Use the non-nullable latitude and longitude from LocationData
+                position: LatLng(
+                    locationData!.latitude!, locationData.longitude!),
+                infoWindow: const InfoWindow(title: 'Your Location'),
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueRed),
+              ),
+            );
+            _isLoading = false;
+          });
 
-    _animateCameraToPosition();
-    _fetchNearbyUsers(); // Fetch users after getting location
+          _animateCameraToPosition();
+          _fetchNearbyUsers(); // Fetch users after getting location
+        } else {
+          setState(() => _isLoading = false);
+          print("Could not get valid coordinates from location data.");
+        }
+      } catch (e) {
+        print("Error getting location: $e");
+        setState(() => _isLoading = false);
+      }
+    } else {
+      // This case handles deniedForever or other unhandled permission/service states
+      setState(() => _isLoading = false);
+      print("Location permission not granted or service not enabled.");
+    }
   }
 
   // DUMMY DATA: Replace this with your actual Firestore call
@@ -122,13 +146,17 @@ class _HomePageState extends State<HomePage> {
 
   // Animates the map camera to the user's current position
   void _animateCameraToPosition() {
-    if (_mapController != null && _currentPosition != null) {
+    // Ensure both map controller and current position (with valid coordinates) are available
+    if (_mapController != null &&
+        _currentPosition != null &&
+        _currentPosition!.latitude != null &&
+        _currentPosition!.longitude != null) {
       _mapController!.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
             target: LatLng(
-              _currentPosition!.latitude,
-              _currentPosition!.longitude,
+              _currentPosition!.latitude!, // Use non-nullable latitude
+              _currentPosition!.longitude!, // Use non-nullable longitude
             ),
             zoom: 15.5,
           ),
@@ -161,12 +189,15 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
         children: [
           // --- Google Map Background ---
-          if (_currentPosition != null)
+          // Only show map if current position and its coordinates are valid
+          if (_currentPosition != null &&
+              _currentPosition!.latitude != null &&
+              _currentPosition!.longitude != null)
             GoogleMap(
               onMapCreated: (controller) => _mapController = controller,
               initialCameraPosition: CameraPosition(
-                target:
-                    LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+                target: LatLng(_currentPosition!.latitude!,
+                    _currentPosition!.longitude!),
                 zoom: 15.5,
               ),
               markers: _markers,
