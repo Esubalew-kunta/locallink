@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:locallink/homepage.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({Key? key}) : super(key: key);
@@ -43,10 +44,15 @@ class _SignupPageState extends State<SignupPage> {
     }
 
     if (_formKey.currentState!.validate()) {
-     //signup 
-      
+   
+      Navigator.push(
+  context,
+  MaterialPageRoute(builder: (context) => const HomePage()),
+);
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Processing signup...')),
+        
       );
     }
   }

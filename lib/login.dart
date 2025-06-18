@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:locallink/homepage.dart';
 import 'package:locallink/signup.dart';
 
 class LoginPage extends StatefulWidget {
@@ -22,7 +23,11 @@ class _LoginPageState extends State<LoginPage> {
       
       // In a real app, you would call your authentication service
       // Example: authService.login(_emailController.text, _passwordController.text);
-      
+        Navigator.push(
+  context,
+  MaterialPageRoute(builder: (context) => const HomePage()),
+);
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Processing login...')),
       );
