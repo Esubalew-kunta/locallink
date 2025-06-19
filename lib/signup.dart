@@ -218,6 +218,7 @@ class _SignupPageState extends State<SignupPage> {
                     onPressed: _submitForm,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: Colors.deepPurple,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -225,6 +226,7 @@ class _SignupPageState extends State<SignupPage> {
                     child: const Text(
                       'Sign Up',
                       style: TextStyle(
+                        color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),

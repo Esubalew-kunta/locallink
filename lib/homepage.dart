@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:locallink/login.dart';
 import 'package:locallink/profile.dart';
 import 'package:location/location.dart';
 
@@ -389,6 +390,10 @@ class _HomePageState extends State<HomePage> {
             onTap: () {
               // Handle settings tap
               Navigator.pop(context); // Close drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
             },
           ),
         ],

@@ -137,6 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: _submitForm,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: Colors.deepPurple,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -144,6 +145,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: const Text(
                       'Log In',
                       style: TextStyle(
+                        color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
