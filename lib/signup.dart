@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:locallink/homepage.dart';
+import 'package:locallink/login.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({Key? key}) : super(key: key);
@@ -236,7 +237,10 @@ class _SignupPageState extends State<SignupPage> {
                       const Text("Already have an account?"),
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const LoginPage()),
+                              );
                         },
                         child: const Text('Log In'),
                       ),

@@ -20,13 +20,13 @@ class _LoginPageState extends State<LoginPage> {
     if (_formKey.currentState!.validate()) {
       // Login logic here
       print('Login with: ${_emailController.text}');
-      
+
       // In a real app, you would call your authentication service
       // Example: authService.login(_emailController.text, _passwordController.text);
-        Navigator.push(
-  context,
-  MaterialPageRoute(builder: (context) => const HomePage()),
-);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Processing login...')),
@@ -43,7 +43,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -129,9 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                      onPressed: () {
-                        
-                      },
+                      onPressed: () {},
                       child: const Text('Forgot Password?'),
                     ),
                   ),
@@ -159,7 +156,6 @@ class _LoginPageState extends State<LoginPage> {
                       const Text("Don't have an account?"),
                       TextButton(
                         onPressed: () {
-                         
                           Navigator.push(
                             context,
                             MaterialPageRoute(

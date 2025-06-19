@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:locallink/homepage.dart';
 import 'package:locallink/login.dart';
+import 'package:locallink/onboarding.dart';
 import 'package:locallink/signup.dart';
 
 
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const SignupPage(),
+      home: OnboardingScreen(onComplete: () {  },),
     );
   }
 }

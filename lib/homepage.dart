@@ -295,7 +295,8 @@ Widget _buildMap() {
           zoom: 15.5,
         ),
         markers: _markers,
-        myLocationButtonEnabled: true, // Allow users to find themselves
+        myLocationButtonEnabled: false, // Allow users to find themselves
+        
         myLocationEnabled: true, // Show blue dot
         zoomControlsEnabled: false,
       ),
